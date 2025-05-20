@@ -16,6 +16,15 @@ Dependencies:
 
 ### Core Functions
 
+- **Mapping Functions**: 
+  - `imap`: List version of `map()`
+  - `timap`: Tuple version of `map()`
+  - `izip`: List version of `zip()`
+  - `ifilter`: List version of `filter()`
+  - `dmap`: Apply function to dictionary values
+  - `dfilter`: Filter dictionary keys based on values
+  - `flatten`: Flatten nested lists
+  - `unique`: Return unique values from a list
 - **Function Wrappers**: Operations using subtraction syntax
 - **Smart String Splitting**: Handle nested brackets, quotes and special characters
 - **Data Structure Manipulation**: Functions for dictionaries, lists and pandas DataFrames
@@ -28,6 +37,15 @@ from sugar import *
 
 # List operations
 imap(lambda x: x+2, [2, 3, 4])  # [4, 5, 6]
+timap(lambda x: x+2, [2, 3, 4])  # (4, 5, 6)
+izip([1, 2], ['a', 'b'])        # [(1, 'a'), (2, 'b')]
+ifilter(lambda x: x > 2, [1, 2, 3, 4])  # [3, 4]
+flatten([[1, 2], [3, 4]])       # [1, 2, 3, 4]
+unique([1, 2, 2, 3, 3])         # [1, 2, 3]
+
+# Dictionary operations
+dmap(lambda x: x*2, {'a': 1, 'b': 2})  # {'a': 2, 'b': 4}
+dfilter(lambda x: x > 1, {'a': 1, 'b': 2, 'c': 3})  # ['b', 'c']
 
 # String splitting
 'a, b, c'-spl                   # ['a', 'b', 'c']
