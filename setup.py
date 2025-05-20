@@ -5,8 +5,9 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        # List dependencies here
-        # "numpy>=1.20.0",
+        "pandas",
+        "oyaml",
+        "more_itertools",
     ],
     author="Gabi Teodoru",
     author_email="gabiteodoru@gmail.com",
