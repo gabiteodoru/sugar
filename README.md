@@ -5,7 +5,7 @@ A lightweight utility package that provides syntactic sugar and data manipulatio
 ## Installation
 
 ```bash
-pip install sugar
+pip install git+https://github.com/gabiteodoru/sugar.git
 ```
 
 Dependencies:
