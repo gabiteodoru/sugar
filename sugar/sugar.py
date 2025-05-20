@@ -67,7 +67,7 @@ Out[503]:
 
 import re
 import pandas as pd
-import oyaml as yaml  # conda install oyaml
+# import oyaml as yaml  # conda install oyaml # was used for old Obj print
 import copy
 import more_itertools  # conda install more-itertools
 
