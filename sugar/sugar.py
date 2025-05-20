@@ -260,90 +260,102 @@ def frontCols(x, c):
     newCols = [i for i in c if i in x.columns] + [i for i in x.columns if not i in c]
     return x[newCols]
 
-class Obj0:
-    def __init__(self, **d):
-        object.__setattr__(self, '_dictKeys', list(d.keys()))
-        for a, b in d.items(): object.__setattr__(self, a, b)
-    def __contains__(self, x):
-        return x in self._dictKeys
-    def __len__(self):
-        return len(self._dictKeys)
-    def __getitem__(self, key):
-        return getattr(self, key)
-    def get(self, key, default = None):
-        return self[key] if key in self._dictKeys or default is None else default
-    def _to_dict(self):
-        return {k: getattr(self, k) for k in self._dictKeys}
-    def __iter__(self):
-        for k in self._dictKeys:
-            yield k, getattr(self, k)
-    def __repr__(self):
-        try:
-            r = yaml.dump(self._to_dict())
-        except:
-            r = self._to_dict().__repr__()
-        return r
-    def __setitem__(self, key, value):
-        object.__setattr__(self, key, value)
-        if key not in self._dictKeys:
-            self._dictKeys.append(key)
-Obj0.__setattr__ = Obj0.__setitem__    
+# class Obj0:
+#     def __init__(self, **d):
+#         object.__setattr__(self, '_dictKeys', list(d.keys()))
+#         for a, b in d.items(): object.__setattr__(self, a, b)
+#     def __contains__(self, x):
+#         return x in self._dictKeys
+#     def __len__(self):
+#         return len(self._dictKeys)
+#     def __getitem__(self, key):
+#         return getattr(self, key)
+#     def get(self, key, default = None):
+#         return self[key] if key in self._dictKeys or default is None else default
+#     def _to_dict(self):
+#         return {k: getattr(self, k) for k in self._dictKeys}
+#     def __iter__(self):
+#         for k in self._dictKeys:
+#             yield k, getattr(self, k)
+#     def __repr__(self):
+#         try:
+#             r = yaml.dump(self._to_dict())
+#         except:
+#             r = self._to_dict().__repr__()
+#         return r
+#     def __setitem__(self, key, value):
+#         object.__setattr__(self, key, value)
+#         if key not in self._dictKeys:
+#             self._dictKeys.append(key)
+# Obj0.__setattr__ = Obj0.__setitem__    
 
-class Obj(Obj0):
-    def __init__(self, **d):
-        Obj0.__init__(self, **d)
-        object.__setattr__(self, 'strict', False)
-        for a, b in d.items():
-            if isinstance(b, (list, tuple)):
-               setattr(self, a, [Obj(**x) if isinstance(x, dict) else x for x in b])
-            else:
-               setattr(self, a, Obj(**b) if isinstance(b, dict) else b)
-    def _to_dict(self):
-        return {k: (lambda x: [y._to_dict() if isinstance(y, Obj) else y for y in x] if type(x)==list else x._to_dict() if isinstance(x, Obj) else x)(getattr(self, k)) for k in self._dictKeys}
-    def __lshift__(self, d):
-        newObj = self.copy()
-        newObj <<= d
-        return newObj
-    def __ilshift__(self, d):
-        if isinstance(d, Obj):
-            self.__ilshift__(d._to_dict())
+# class Obj(Obj0):
+#     def __init__(self, **d):
+#         Obj0.__init__(self, **d)
+#         object.__setattr__(self, 'strict', False)
+#         for a, b in d.items():
+#             if isinstance(b, (list, tuple)):
+#                setattr(self, a, [Obj(**x) if isinstance(x, dict) else x for x in b])
+#             else:
+#                setattr(self, a, Obj(**b) if isinstance(b, dict) else b)
+#     def _to_dict(self):
+#         return {k: (lambda x: [y._to_dict() if isinstance(y, Obj) else y for y in x] if type(x)==list else x._to_dict() if isinstance(x, Obj) else x)(getattr(self, k)) for k in self._dictKeys}
+#     def __lshift__(self, d):
+#         newObj = self.copy()
+#         newObj <<= d
+#         return newObj
+#     def __ilshift__(self, d):
+#         if isinstance(d, Obj):
+#             self.__ilshift__(d._to_dict())
+#         else:
+#             for a, b in d.items():
+#                 if isinstance(b, (list, tuple)):
+#                    setattr(self, a, [Obj(**x) if isinstance(x, dict) else x for x in b])
+#                 else:
+#                     if isinstance(b, dict):
+#                         if a in self._dictKeys and isinstance(getattr(self, a), Obj):
+#                             getattr(self, a).__ilshift__(b)
+#                         else:
+#                             setattr(self, a, Obj(**b) if isinstance(b, dict) else b)
+#                     else:
+#                         setattr(self, a, b)
+#                 if a not in self._dictKeys:
+#                     self._dictKeys.append(a)
+#         return self
+#     def __setattr__(self, key, value):
+#         if key not in self._dictKeys:
+#             if self._strict:
+#                 raise BaseException("Can't add new key, Obj in strict mode")
+#             else:
+#                 self._dictKeys.append(key)
+#         object.__setattr__(self, key, value)
+#     def setStrict(self, val):
+#         object.__setattr__(self, '_strict', val)
+#         for k in self._dictKeys:
+#             if type(k) == Obj:
+#                 self[k].setStrict(val)
+#     def __setitem__(self, key, value):
+#         setattr(self, key, value)
+#     def copy(self):
+#         return copy.deepcopy(self)
+
+# def createNestedObj(*args, init = []):
+#     r = copy.deepcopy(init)
+#     for a in args[::-1]:
+#         r = {i:copy.deepcopy(r) for i in a-spl}
+#     return Obj(**r)
+
+class Obj(dict):
+    def __init__(self, *args, **kwargs):
+        if len(args) == 0 and len(kwargs) == 0:
+            args = [{}]
+        super().__init__(*args, **kwargs)
+        self.__dict__ = self
+    def __getitem__(self, k):
+        if type(k) == list:
+            return [self[i] for i in k]
         else:
-            for a, b in d.items():
-                if isinstance(b, (list, tuple)):
-                   setattr(self, a, [Obj(**x) if isinstance(x, dict) else x for x in b])
-                else:
-                    if isinstance(b, dict):
-                        if a in self._dictKeys and isinstance(getattr(self, a), Obj):
-                            getattr(self, a).__ilshift__(b)
-                        else:
-                            setattr(self, a, Obj(**b) if isinstance(b, dict) else b)
-                    else:
-                        setattr(self, a, b)
-                if a not in self._dictKeys:
-                    self._dictKeys.append(a)
-        return self
-    def __setattr__(self, key, value):
-        if key not in self._dictKeys:
-            if self._strict:
-                raise BaseException("Can't add new key, Obj in strict mode")
-            else:
-                self._dictKeys.append(key)
-        object.__setattr__(self, key, value)
-    def setStrict(self, val):
-        object.__setattr__(self, '_strict', val)
-        for k in self._dictKeys:
-            if type(k) == Obj:
-                self[k].setStrict(val)
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-    def copy(self):
-        return copy.deepcopy(self)
-
-def createNestedObj(*args, init = []):
-    r = copy.deepcopy(init)
-    for a in args[::-1]:
-        r = {i:copy.deepcopy(r) for i in a-spl}
-    return Obj(**r)
+            return super().__getitem__(k)
 
 def createNestedStruct(*args, init = []):
     r = copy.deepcopy(init)
