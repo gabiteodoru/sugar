@@ -260,6 +260,18 @@ def frontCols(x, c):
     newCols = [i for i in c if i in x.columns] + [i for i in x.columns if not i in c]
     return x[newCols]
 
+class Obj(dict):
+    def __init__(self, *args, **kwargs):
+        if len(args) == 0 and len(kwargs) == 0:
+            args = [{}]
+        super().__init__(*args, **kwargs)
+        self.__dict__ = self
+    def __getitem__(self, k):
+        if type(k) == list:
+            return [self[i] for i in k]
+        else:
+            return super().__getitem__(k)
+
 # class Obj0:
 #     def __init__(self, **d):
 #         object.__setattr__(self, '_dictKeys', list(d.keys()))
@@ -345,17 +357,7 @@ def frontCols(x, c):
 #         r = {i:copy.deepcopy(r) for i in a-spl}
 #     return Obj(**r)
 
-class Obj(dict):
-    def __init__(self, *args, **kwargs):
-        if len(args) == 0 and len(kwargs) == 0:
-            args = [{}]
-        super().__init__(*args, **kwargs)
-        self.__dict__ = self
-    def __getitem__(self, k):
-        if type(k) == list:
-            return [self[i] for i in k]
-        else:
-            return super().__getitem__(k)
+
 
 def createNestedStruct(*args, init = []):
     r = copy.deepcopy(init)
@@ -375,3 +377,10 @@ runpy = "lambda x:exec(open(x).read())"
 #     main_module = sys.modules['__main__']
 #     main_globals = main_module.__dict__
 #     return eval("lambda x: exec(open(x).read())", main_globals)
+
+import pickle
+def loadpkl(f):
+    return pickle.load(open(f, 'rb'))
+
+def savepkl(x, f):
+    pickle.dump(x, open(f, 'wb'))
